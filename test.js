@@ -3,27 +3,9 @@ const sinon = require("sinon");
 const { expect } = require("chai");
 
 describe("67672805", () => {
-  const originalDescriptor = Object.getOwnPropertyDescriptor(
-    AWS,
-    "SecretsManager"
-  );
-
   afterEach(() => {
-    console.log("afterEach pre");
     sinon.restore();
-    printObjectDescriptor();
-    console.log("afterEach post");
   });
-
-  function printObjectDescriptor() {
-    const descriptor = Object.getOwnPropertyDescriptor(AWS, "SecretsManager");
-    console.log(descriptor);
-    console.log(
-      "descriptor.value unmodified?",
-      descriptor.value === originalDescriptor.value
-    );
-  }
-
   it("should get secret value", async () => {
     const data = {
       SecretString: JSON.stringify({
@@ -31,17 +13,14 @@ describe("67672805", () => {
         privateKey: "secretPassword"
       })
     };
-
     const secretsManagerStub = {
       getSecretValue: sinon.stub().callsFake((params, callback) => {
         callback(null, data);
       })
     };
-    printObjectDescriptor();
     const SecretsManagerStub = sinon
       .stub(AWS, "SecretsManager")
       .returns(secretsManagerStub);
-    printObjectDescriptor();
     const main = require("./main");
     const { username, password } = await main("1");
     expect(username).to.equal("secretUsername");
@@ -63,15 +42,15 @@ describe("67672805", () => {
         callback(err);
       })
     };
-    printObjectDescriptor();
     const SecretsManagerStub = sinon
       .stub(AWS, "SecretsManager")
       .returns(secretsManagerStub);
-    printObjectDescriptor();
     const main = require("./main");
-    const { username, password } = await main("1");
-    expect(username).to.not.equal("secretUsername");
-    expect(password).to.not.equal("secretPassword");
+    try {
+      await main("1");
+    } catch (err) {
+      expect(err.message).to.match(/There was an error/);
+    }
     sinon.assert.calledOnce(SecretsManagerStub);
     sinon.assert.calledOnceWithExactly(
       secretsManagerStub.getSecretValue,
