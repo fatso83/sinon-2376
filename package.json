@@ -1,0 +1,18 @@
+{
+  "name": "sinon-2376",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.894.0",
+    "chai": "^4.3.4",
+    "mocha": "^8.4.0",
+    "sinon": "^10.0.0"
+  }
+}
